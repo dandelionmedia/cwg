@@ -34,7 +34,7 @@
   --mark:rgba(217,184,114,.30); --mark-ink:#F7E7C2; --ok:#5ACB90;
   --shadow:0 1px 0 rgba(255,255,255,.03),0 14px 30px -18px rgba(0,0,0,.7); color-scheme:dark}
 
-html{font-size:17px;scroll-behavior:smooth;scroll-padding-top:80px}
+html{font-size:17px;scroll-padding-top:80px}
 @media (min-width:600px){html{font-size:18px}}
 @media (min-width:1100px){html{font-size:19px}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
@@ -62,7 +62,7 @@ button{font:inherit;cursor:pointer}
 #stars{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 
 /* ── 고정 내비 ── */
-.navbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.navbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 6px 16px -14px rgba(15,27,45,.35)}
 .tabs{display:flex;gap:.3rem;overflow-x:auto;padding-block:.65rem;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tabs a{flex:0 0 auto;display:flex;align-items:center;gap:.45rem;text-decoration:none;color:var(--muted);font-weight:700;font-size:.92rem;padding:.42rem .95rem;border-radius:999px;border:1px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
@@ -127,7 +127,7 @@ h3.step small{font-family:var(--f-body);font-weight:500;color:var(--muted);font-
 
 /* ── 프롬프트 카드 ── */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:1.1rem}
-.pcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.25rem 1.3rem 1.1rem;display:flex;flex-direction:column;gap:.75rem;min-width:0;box-shadow:var(--shadow);transition:border-color .2s}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.25rem 1.3rem 1.1rem;display:flex;flex-direction:column;gap:.75rem;min-width:0;box-shadow:var(--shadow);transition:border-color .2s;touch-action:pan-y}
 .pcard:hover{border-color:var(--line-strong)}
 .pcard.bad{background:var(--surface-2);box-shadow:none;border-style:dashed}
 .pcard .top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
@@ -615,7 +615,8 @@ function openDrawer(){
   drawer.hidden = false; document.body.style.overflow = "hidden"; openBtn.setAttribute("aria-expanded","true");
   requestAnimationFrame(()=>requestAnimationFrame(()=>drawer.classList.add("open")));
   const on = drawer.querySelector("li.on > a"); (on || drawer.querySelector(".dh button")).focus({preventScroll:true});
-  if (on) on.scrollIntoView({block:"center"});
+  const list = document.getElementById("dtoc");
+  if (on) list.scrollTop = Math.max(0, on.parentElement.offsetTop - 12);
 }
 function closeDrawer(){
   drawer.classList.remove("open"); document.body.style.overflow = ""; openBtn.setAttribute("aria-expanded","false");
@@ -640,7 +641,7 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-close]") && !drawer.hidden){
     const a = e.target.closest("a[href^='#']");
     closeDrawer();
-    if (a){ e.preventDefault(); const t = document.getElementById(a.getAttribute("href").slice(1)); if (t) setTimeout(()=>t.scrollIntoView({behavior:"smooth"}), 60); }
+    if (a){ e.preventDefault(); const t = document.getElementById(a.getAttribute("href").slice(1)); if (t) setTimeout(()=>goTo(t), 60); }
   }
 });
 
@@ -657,20 +658,35 @@ document.querySelectorAll(".checks[data-store]").forEach(ul => {
 /* 현재 섹션 표시 */
 const links = [...tabs.querySelectorAll("a")];
 const cur = document.getElementById("cur");
+let activeId = null;
 function setActive(id){
-  const s = SECTIONS.find(x => x.id===id); if (!s) return;
+  const s = SECTIONS.find(x => x.id===id); if (!s || id===activeId) return;
+  activeId = id;
   links.forEach(a => a.classList.toggle("on", a.dataset.id === id));
   drawer.querySelectorAll(".dtoc > li").forEach(li => li.classList.toggle("on", li.dataset.id === id));
   cur.innerHTML = `<b>${s.num}</b><span>${s.title}</span>`; cur.setAttribute("href", "#"+id);
-  const on = tabs.querySelector("a.on"); if (on && tabs.offsetParent) on.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
+  /* 탭 줄만 가로로 움직임 — 페이지 세로 스크롤은 건드리지 않음 */
+  const on = tabs.querySelector("a.on");
+  if (on && tabs.offsetParent) tabs.scrollLeft = on.offsetLeft - (tabs.clientWidth - on.offsetWidth) / 2;
 }
+function goTo(el){
+  const top = el.getBoundingClientRect().top + window.scrollY - 76;
+  window.scrollTo({top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[href^='#']");
+  if (!a || a.hasAttribute("data-close")) return;
+  const t = document.getElementById(a.getAttribute("href").slice(1));
+  if (t){ e.preventDefault(); goTo(t); }
+});
 const io = new IntersectionObserver(ents => { ents.forEach(en => { if (en.isIntersecting) setActive(en.target.id); }); }, { rootMargin:"-35% 0px -60% 0px" });
 document.querySelectorAll("main section").forEach(s => io.observe(s));
 setActive("start");
 
 /* 맨위 버튼 */
 const totop = document.getElementById("totop");
-const onScroll = () => totop.classList.toggle("show", window.scrollY > 480);
+let ticking = false, shown = false;
+const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { const s = window.scrollY > 480; if (s !== shown){ shown = s; totop.classList.toggle("show", s); } ticking = false; }); };
 addEventListener("scroll", onScroll, {passive:true}); onScroll();
 totop.addEventListener("click", () => { window.scrollTo({top:0, behavior:"smooth"}); });
 
@@ -685,7 +701,7 @@ function stars(){
   const n = Math.round(r.width*r.height/6000);
   for (let i=0;i<n;i++){ const g = rnd()>.85; x.fillStyle = g ? `rgba(233,210,160,${0.5+rnd()*0.4})` : `rgba(243,238,226,${0.2+rnd()*0.55})`; x.beginPath(); x.arc(rnd()*r.width, rnd()*r.height*0.78, rnd()*1.2+0.3, 0, Math.PI*2); x.fill(); }
 }
-stars(); let rz; addEventListener("resize", ()=>{ clearTimeout(rz); rz = setTimeout(stars, 150); });
+stars(); let rz, lastW = innerWidth; addEventListener("resize", ()=>{ if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rz); rz = setTimeout(stars, 150); });
 })();
 </script>
 
