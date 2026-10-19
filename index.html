@@ -1,0 +1,590 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>철원여고 AI 실습 프롬프트</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 철원 밤하늘 띠(헤더) + 황금 들판 선 → 교시 순서대로 이어지는 섹션, 프롬프트는 '복사 카드'로 */
+:root{
+  --bg:#F2F4EE; --surface:#FFFFFF; --ink:#15233A; --muted:#55617A; --line:#D7DCCD;
+  --band:#14223B; --band-ink:#F4F1E4; --band-muted:#B9C2D6;
+  --gold:#A86F00; --gold-soft:#FBEAB4; --btn:#F2B630; --btn-ink:#14223B; --btn-hover:#E1A21A;
+  --crane:#C2352A; --crane-soft:#FBE3DF;
+  --mark:#FFE36E; --mark-ink:#15233A;
+  --ok:#1F7A4D;
+  --f-display:"Black Han Sans","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1524; --surface:#16213A; --ink:#EEF1F7; --muted:#A9B3C7; --line:#2A3755;
+  --band:#08101E; --band-ink:#F4F1E4; --band-muted:#9FAACB;
+  --gold:#F2B630; --gold-soft:#3A3118; --btn:#F2B630; --btn-ink:#14223B; --btn-hover:#FFC94D;
+  --crane:#FF8A7A; --crane-soft:#3D1F22;
+  --mark:rgba(242,182,48,.30); --mark-ink:#FFEDB5; --ok:#5BD69A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#16213A; --ink:#EEF1F7; --muted:#A9B3C7; --line:#2A3755;
+  --band:#08101E; --band-ink:#F4F1E4; --band-muted:#9FAACB;
+  --gold:#F2B630; --gold-soft:#3A3118; --btn:#F2B630; --btn-ink:#14223B; --btn-hover:#FFC94D;
+  --crane:#FF8A7A; --crane-soft:#3D1F22;
+  --mark:rgba(242,182,48,.30); --mark-ink:#FFEDB5; --ok:#5BD69A; color-scheme:dark}
+
+html{font-size:17px;scroll-behavior:smooth;scroll-padding-top:84px}
+@media (min-width:600px){html{font-size:18px}}
+@media (min-width:1100px){html{font-size:19px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--band)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--btn);outline-offset:2px;border-radius:6px}
+
+/* ── 헤더 ── */
+.hero{background:var(--band);color:var(--band-ink);position:relative;overflow:hidden}
+.hero .wrap{padding-block:2.2rem 0;position:relative;z-index:1}
+.eyebrow{display:inline-block;font-weight:700;font-size:.82rem;letter-spacing:.12em;color:var(--btn);border:1.5px solid var(--btn);border-radius:999px;padding:.15rem .8rem}
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.15;margin-top:.8rem;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--btn)}
+.hero .sub{font-size:1.15rem;font-weight:500;margin-top:.5rem;color:var(--band-ink)}
+.hero .meta{color:var(--band-muted);font-size:.95rem;margin-top:.3rem}
+.tools{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.3rem}
+.tools a{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.28);color:var(--band-ink);text-decoration:none;font-weight:700;padding:.6rem 1.1rem;border-radius:12px;font-size:1rem}
+.tools a:hover{background:rgba(255,255,255,.16)}
+.tools a span{color:var(--band-muted);font-weight:500;font-size:.85rem}
+.horizon{display:block;width:100%;height:auto;margin-top:1.2rem}
+#stars{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+
+/* ── 내비 ── */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:.4rem;overflow-x:auto;padding-block:.6rem;scrollbar-width:none}
+nav.tabs .wrap::-webkit-scrollbar{display:none}
+nav.tabs a{flex:0 0 auto;display:flex;align-items:center;gap:.4rem;text-decoration:none;color:var(--muted);font-weight:700;font-size:.95rem;padding:.45rem .9rem;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);white-space:nowrap}
+nav.tabs a b{font-family:var(--f-display);font-weight:400;color:var(--gold)}
+nav.tabs a.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+nav.tabs a.on b{color:var(--btn)}
+
+/* ── 섹션 ── */
+main section{padding-block:2.6rem 1rem;border-bottom:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;align-items:start;margin-bottom:1.2rem}
+.sec-num{grid-row:span 2;font-family:var(--f-display);font-size:3.4rem;line-height:1;color:var(--gold)}
+.sec-kicker{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.chip{display:inline-block;font-size:.8rem;font-weight:700;padding:.12rem .65rem;border-radius:999px;background:var(--gold-soft);color:var(--gold);letter-spacing:.02em}
+.chip.time{background:var(--crane-soft);color:var(--crane)}
+.sec-head h2{font-family:var(--f-display);font-weight:400;font-size:clamp(1.7rem,4.6vw,2.4rem);line-height:1.25}
+.goal{grid-column:1/-1;margin:.6rem 0 0;color:var(--muted);font-size:1.05rem;max-width:62ch}
+.goal strong{color:var(--ink)}
+h3.step{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;font-size:1.3rem;font-weight:900;margin:2rem 0 .9rem}
+h3.step .s{font-family:var(--f-display);font-weight:400;color:var(--bg);background:var(--ink);font-size:.95rem;padding:.12rem .6rem;border-radius:6px;letter-spacing:.04em}
+h3.step small{font-weight:500;color:var(--muted);font-size:.95rem}
+.note{color:var(--muted);font-size:1rem;margin:.4rem 0 0}
+
+/* ── 프롬프트 카드 ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:1rem}
+.grid.one{grid-template-columns:1fr}
+.pcard{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem 1rem;display:flex;flex-direction:column;gap:.7rem;min-width:0}
+.pcard.bad{border-style:dashed}
+.pcard .top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pcard .label{font-weight:900;font-size:1.05rem}
+.tag-bad{font-size:.78rem;font-weight:700;color:var(--crane);background:var(--crane-soft);padding:.1rem .55rem;border-radius:999px}
+.tag-good{font-size:.78rem;font-weight:700;color:var(--ok);border:1.5px solid currentColor;padding:.05rem .5rem;border-radius:999px}
+.tag-img{font-size:.78rem;font-weight:700;color:var(--gold);background:var(--gold-soft);padding:.1rem .55rem;border-radius:999px}
+.ptext{font-size:1.18rem;line-height:1.8;margin:0;flex:1;white-space:pre-wrap}
+.prefix{display:block;color:var(--gold);font-weight:700;font-size:.98rem}
+mark.fill{background:linear-gradient(transparent 38%,var(--mark) 38%);color:var(--mark-ink);padding:0 .1em;font-weight:700;border-radius:2px}
+.copy{align-self:flex-end;display:inline-flex;align-items:center;gap:.45rem;background:var(--btn);color:var(--btn-ink);border:0;border-radius:12px;font-weight:900;font-size:1.02rem;padding:.65rem 1.25rem;min-height:48px;transition:background .15s,transform .1s}
+.copy:hover{background:var(--btn-hover)}
+.copy:active{transform:scale(.97)}
+.copy.done{background:var(--ok);color:#fff}
+.copy svg{width:1.1em;height:1.1em}
+
+/* ── 기타 블록 ── */
+.formula{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:.7rem;margin-top:.4rem}
+.fx{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:.9rem 1rem;min-width:0}
+.fx b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.4rem;color:var(--gold)}
+.fx span{display:block;font-weight:700}
+.fx i{display:block;font-style:normal;color:var(--muted);font-size:.95rem;margin-top:.2rem}
+.chain{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;font-weight:700;font-size:1.08rem;margin-top:.3rem}
+.chain span{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:.35rem .8rem}
+.chain i{font-style:normal;color:var(--gold);font-weight:900}
+.callout{display:flex;gap:.8rem;align-items:flex-start;background:var(--crane-soft);color:var(--ink);border-radius:14px;padding:1rem 1.1rem;margin-top:1.2rem;font-size:1.02rem}
+.callout b{color:var(--crane)}
+.callout.tip{background:var(--gold-soft)}
+.callout.tip b{color:var(--gold)}
+.result{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:1.4rem;font-weight:700;font-size:1.05rem}
+.result span{background:var(--ink);color:var(--bg);font-size:.8rem;padding:.15rem .6rem;border-radius:6px}
+.jobbox{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;background:var(--surface);border:2px solid var(--btn);border-radius:14px;padding:.9rem 1rem;margin-bottom:1rem}
+.jobbox label{font-weight:900;font-size:1.05rem}
+.jobbox input{flex:1 1 220px;min-width:0}
+input[type=text],textarea{font:inherit;font-size:1.08rem;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:.6rem .8rem;width:100%}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--btn);box-shadow:0 0 0 3px var(--gold-soft)}
+.words{display:grid;gap:.9rem}
+.words .row{display:grid;grid-template-columns:7.5rem 1fr;gap:.6rem;align-items:start}
+@media (max-width:560px){.words .row{grid-template-columns:1fr}}
+.words .row > b{padding-top:.35rem}
+.wchips{display:flex;flex-wrap:wrap;gap:.4rem}
+.wchips button{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);border-radius:999px;padding:.35rem .85rem;font-size:1rem;font-weight:500}
+.wchips button:hover{border-color:var(--btn)}
+.wchips button.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.checks{list-style:none;padding:0;margin:.4rem 0 0;display:grid;gap:.5rem}
+.checks label{display:flex;gap:.7rem;align-items:flex-start;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-size:1.05rem;cursor:pointer}
+.checks input{width:1.4rem;height:1.4rem;flex:0 0 auto;margin-top:.2rem;accent-color:var(--ok)}
+.checks label:has(input:checked){border-color:var(--ok)}
+.quote{font-family:var(--f-display);font-weight:400;font-size:clamp(1.4rem,4vw,2rem);line-height:1.35;margin:1.8rem 0 .4rem;text-align:left}
+.quote em{font-style:normal;color:var(--gold)}
+.steps4{list-style:none;padding:0;margin:0;display:grid;gap:.8rem}
+.steps4 > li{display:grid;grid-template-columns:auto 1fr;gap:.8rem;align-items:start}
+.steps4 .n{font-family:var(--f-display);font-size:1.6rem;line-height:1.2;color:var(--gold);width:2rem;text-align:center}
+.steps4 .body{min-width:0;display:grid;gap:.5rem}
+.steps4 .body > b{font-size:1.1rem}
+.steps4 .body > p{margin:0;color:var(--muted)}
+
+/* 빌더 */
+.builder{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:1.2rem;display:grid;gap:.8rem}
+.builder .f{display:grid;grid-template-columns:7rem 1fr;gap:.6rem;align-items:center}
+@media (max-width:560px){.builder .f{grid-template-columns:1fr;gap:.25rem}}
+.builder .f label{font-weight:900}
+.builder .f label small{display:block;font-weight:500;color:var(--muted);font-size:.8rem}
+.preview{border-top:1.5px dashed var(--line);padding-top:.9rem;display:grid;gap:.6rem}
+.preview .ptext{font-size:1.12rem}
+.brow{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}
+.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);border-radius:10px;padding:.5rem .9rem;font-weight:700}
+.ghost:hover{color:var(--ink);border-color:var(--ink)}
+.ethics{counter-reset:e;list-style:none;padding:0;margin:0;display:grid;gap:.6rem}
+.ethics li{counter-increment:e;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;align-items:baseline;font-size:1.08rem}
+.ethics li::before{content:counter(e);font-family:var(--f-display);font-size:1.6rem;color:var(--gold);text-align:center}
+.ethics b{margin-right:.3rem}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:1.2rem}
+
+footer{padding-block:2.4rem 3rem;color:var(--muted);font-size:.92rem}
+footer b{color:var(--ink)}
+
+/* 토스트 */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--ink);color:var(--bg);font-weight:700;padding:.85rem 1.3rem;border-radius:14px;z-index:20;transition:transform .25s ease;max-width:calc(100% - 32px);text-align:center;font-size:1rem}
+.toast.show{transform:translate(-50%,0)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<header class="hero">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <span class="eyebrow">철원여자고등학교 · AI 진로교육</span>
+    <h1>AI 실습 <em>프롬프트</em> 모음</h1>
+    <p class="sub">고등학생의 AI 활용법 및 AI 시대의 직업군</p>
+    <p class="meta">2026. 10. 21.(수) 13:30~15:20 · 강사 김유성 (친절한유성쌤)</p>
+    <div class="tools">
+      <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT 열기 <span>새 탭 ↗</span></a>
+      <a href="https://gemini.google.com" target="_blank" rel="noopener">구글 Gemini 열기 <span>새 탭 ↗</span></a>
+    </div>
+  </div>
+  <svg class="horizon" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 60 C 180 40, 320 52, 480 46 S 820 30, 1000 44 S 1150 50, 1200 42 L1200 90 L0 90Z" fill="#3B4A3A"/>
+    <path d="M0 72 C 200 62, 400 70, 600 64 S 1000 58, 1200 66 L1200 90 L0 90Z" fill="#C99A2E"/>
+    <path d="M0 82 C 300 76, 600 84, 900 78 S 1100 80, 1200 79 L1200 90 L0 90Z" fill="#E7B84A"/>
+    <g fill="none" stroke="#F4F1E4" stroke-width="2" stroke-linecap="round">
+      <path d="M860 20 l6 4 l6 -4"/><path d="M842 28 l5 3.5 l5 -3.5"/><path d="M878 28 l5 3.5 l5 -3.5"/>
+      <path d="M826 36 l4 3 l4 -3"/><path d="M896 36 l4 3 l4 -3"/>
+    </g>
+  </svg>
+</header>
+
+<nav class="tabs" aria-label="실습 순서">
+  <div class="wrap" id="tabs"></div>
+</nav>
+
+<main class="wrap" id="main"></main>
+
+<footer class="wrap">
+  <p><b>AI콘텐츠마케팅연구소 유쌤클래스</b> · 강사 김유성(친절한유성쌤) · 운영기관 철원플라즈마 산업기술연구원</p>
+  <p>프롬프트를 복사해 붙여 넣고, <mark class="fill">( ) 괄호 안</mark>만 내 이야기로 바꾸면 됩니다.</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<textarea id="clip" class="sr" aria-hidden="true" tabindex="-1"></textarea>
+
+<script>
+(function(){
+const IMG = "다음 내용으로 이미지를 만들어 줘: ";
+
+/* p(label, text, opts) — opts: img(이미지 접두어), bad, good, sameAs */
+function p(label, text, o){ return Object.assign({label, text}, o||{}); }
+
+const SECTIONS = [
+{ id:"start", num:"0", nav:"사용법", title:"활동지 사용 방법", kicker:["시작 전에"],
+  goal:"프롬프트를 <strong>복사</strong>해 AI 입력창에 붙여 넣고, <strong>( ) 괄호 안</strong>만 내 이야기로 바꾸면 됩니다. 도구는 ChatGPT 또는 구글 Gemini 중 편한 것을 쓰세요.",
+  html:`
+  <h3 class="step"><span class="s">글쓰기</span>프롬프트 공식 <small>역할 + 상황 + 요청 + 형식</small></h3>
+  <div class="formula">
+    <div class="fx"><b>역할</b><span>AI에게 맡길 사람 역할</span><i>너는 고등학생 진로 상담 선생님이야</i></div>
+    <div class="fx"><b>상황</b><span>나에 대한 정보, 배경</span><i>나는 철원에 사는 고2 학생이고 간호사에 관심이 있어</i></div>
+    <div class="fx"><b>요청</b><span>해 줬으면 하는 일</span><i>이 직업이 하는 일과 필요한 역량을 알려 줘</i></div>
+    <div class="fx"><b>형식</b><span>결과를 받고 싶은 모양</span><i>표로, 5가지로, 300자 이내로, 쉬운 말로</i></div>
+  </div>
+  <h3 class="step"><span class="s">이미지</span>프롬프트 공식</h3>
+  <div class="chain"><span>주제</span><i>+</i><span>장면·행동</span><i>+</i><span>배경</span><i>+</i><span>스타일</span><i>+</i><span>분위기·색감</span><i>+</i><span>구도(비율)</span></div>
+  <h3 class="step"><span class="s">대화</span>이어가기 요령 <small>마음에 안 드는 부분을 콕 집어 다시 말해요</small></h3>`,
+  groups:[{ items:[
+    p("쉽게 바꾸기","더 쉽게 설명해 줘. 고등학생 눈높이로 바꿔 줘."),
+    p("자세히 듣기","(3번) 내용을 더 자세히 알려 줘."),
+    p("모양 바꾸기","표로 다시 정리해 줘. 절반 길이로 줄여 줘."),
+    p("더 많이 받기","다른 방향으로 5개 더 제안해 줘.")
+  ]}],
+  after:`<div class="callout"><div><b>지켜야 할 것</b> · 내 이름·전화번호·주소, 친구 얼굴 사진은 입력하지 않습니다.</div></div>`
+},
+{ id:"m1", num:"1", nav:"정보탐색", title:"미션 ① 정보탐색", kicker:["1교시","6분"],
+  goal:"관심 있는 직업 하나를 AI로 조사해 <strong>‘진로 정보 요약표’</strong>를 만듭니다.",
+  groups:[
+   { step:"STEP 1", title:"비교 실험", sub:"대충 쓴 프롬프트 vs 공식대로 쓴 프롬프트", items:[
+     p("대충 쓴 프롬프트","간호사에 대해 알려줘",{bad:true}),
+     p("공식대로 쓴 프롬프트","너는 고등학생 진로 상담 선생님이야. 나는 철원에 사는 고2 학생이고 (간호사)에 관심이 있어. 이 직업이 하는 일, 필요한 역량, 관련 학과, 고등학생 때 준비할 것을 표로 정리해 줘. 고등학생이 이해하기 쉬운 말로 써 줘.",{good:true})
+   ], note:"두 답변을 비교해 보세요. 어느 쪽이 더 쓸모 있나요? 무엇이 달라졌나요?"},
+   { step:"STEP 2", title:"내 직업으로 조사하기", sub:"택1", job:true, items:[
+     p("직업 하루 일과","(직업명)의 하루 일과를 출근부터 퇴근까지 시간대별로 알려 줘. 이 일을 하면서 가장 보람 있는 순간과 가장 힘든 순간도 하나씩 알려 줘."),
+     p("직업과 AI 변화","(직업명)은 AI 때문에 앞으로 10년 안에 어떻게 달라질까? 줄어드는 업무, 새로 생기는 업무, 더 중요해지는 능력을 각각 3가지씩 표로 정리해 줘."),
+     p("학과 탐색","(직업명)이 되려면 대학에서 어떤 학과에 가야 해? 학과별로 배우는 과목, 졸업 후 진로, 고등학교 때 들으면 좋은 선택 과목을 표로 정리해 줘."),
+     p("강원·철원 연계","강원도나 철원 지역에서 (직업명)으로 일할 수 있는 곳은 어떤 종류가 있을까? 기관이나 회사의 '종류'로 알려 주고, 정확하지 않은 정보는 확인이 필요하다고 표시해 줘.")
+   ]},
+   { step:"STEP 3", title:"대화 이어가기", sub:"1개 이상 꼭 해 보기", items:[
+     p("역량 키우기","방금 표에서 '필요한 역량'을 고등학생이 지금부터 키울 수 있는 방법으로 바꿔서 알려 줘."),
+     p("비슷한 직업","이 직업과 비슷하지만 AI와 더 가까운 직업 3가지를 추천해 줘."),
+     p("3줄 요약","이 내용을 친구에게 소개하는 3줄 요약으로 바꿔 줘.")
+   ]}
+  ],
+  after:`<p class="result"><span>결과물</span>진로 정보 요약표 1개 (화면 캡처 또는 메모장에 붙여 넣기)</p>`
+},
+{ id:"m2", num:"2", nav:"아이디어", title:"미션 ② 아이디어 도출·문제해결", kicker:["1교시","6분"],
+  goal:"<strong>A 또는 B 중 하나</strong>를 골라 AI와 함께 아이디어나 해결책을 만듭니다. A를 고른 학생은 다음 이미지 실습에서 포스터로 만들어 봅니다.",
+  groups:[
+   { step:"A", title:"아이디어 도출", sub:"철원을 알리는 10대 축제 기획", items:[
+     p("① 아이디어 받기","너는 지역 축제 기획자야. 철원의 자연(평야, 한탄강, 철새, 별빛)과 농산물(오대쌀 등)을 활용해 10대가 좋아할 축제 아이디어 5가지를 만들어 줘. 축제 이름, 대표 프로그램 3개, 홍보 문구 한 줄을 표로 정리해 줘."),
+     p("② 하나 골라 키우기","5가지 중 (2번) 아이디어가 좋아. 이 축제를 1박 2일 일정표로 만들고, 예상 문제점 3가지와 해결 방법도 알려 줘."),
+     p("③ 홍보 문구","이 축제를 SNS에 올릴 홍보 문구를 10대 말투로 3가지 버전 써 줘. 해시태그 5개도 붙여 줘."),
+     p("④ 비판적으로 보기","이 축제 아이디어의 약점을 냉정하게 3가지 지적해 줘. 그리고 더 좋게 만드는 방법을 알려 줘.")
+   ]},
+   { step:"B", title:"문제해결", sub:"나의 고민을 AI와 함께 풀기", items:[
+     p("시험 공부 계획","기말고사까지 (3주) 남았고 하루 공부 시간은 (3시간)이야. 약한 과목은 (수학, 영어)이고 강한 과목은 (국어)야. 주차별·요일별 공부 계획표를 표로 만들어 줘. 쉬는 날도 하루 넣어 줘."),
+     p("동아리 활동 기획","너는 고등학교 동아리 지도 선생님이야. (과학탐구) 동아리에서 한 학기 동안 할 수 있는 활동 8가지를 월별로 기획해 줘. AI를 활용하는 활동을 2가지 이상 넣어 줘."),
+     p("우리 학교 문제","우리 학교의 문제는 (점심시간 급식 줄이 너무 길다)야. 학생회가 실제로 해 볼 수 있는 해결 아이디어 5가지를 비용이 적게 드는 순서대로 알려 줘."),
+     p("시간 관리","나는 (휴대폰을 오래 봐서) 공부 집중이 잘 안 돼. 고등학생이 오늘부터 바로 실천할 수 있는 방법 5가지를 구체적으로 알려 줘.")
+   ]}
+  ],
+  after:`<p class="result"><span>결과물</span>축제 아이디어 1개(포스터 소재) 또는 나만의 계획표 1개</p>`
+},
+{ id:"image", num:"3", nav:"이미지", title:"이미지 생성 실습", kicker:["1교시","13분"],
+  goal:"공식대로 이미지를 만들고, 스타일을 바꾸고, 대화로 고쳐서 <strong>‘최종 이미지 1장’</strong>을 완성합니다. 이미지 카드는 복사할 때 <strong>“다음 내용으로 이미지를 만들어 줘:”</strong>가 앞에 함께 복사돼요.",
+  groups:[
+   { step:"STEP 1", title:"비교 실험", sub:"강사 시연", items:[
+     p("한 줄 프롬프트","철원 풍경 그려 줘",{bad:true}),
+     p("공식 프롬프트","(가을) 철원평야의 황금빛 논과 멀리 보이는 한탄강 주상절리 협곡, 철새 떼가 V자로 하늘을 나는 장면, 따뜻한 수채화 스타일, 노을빛 주황색 색감, 가로로 넓은 16:9 구도",{img:true,good:true})
+   ]},
+   { step:"STEP 2", title:"기본 생성", sub:"택1 · 4분", items:[
+     p("철원 사계절 풍경","(겨울) 철원의 하얀 눈 덮인 들판에서 두루미 가족이 먹이를 찾는 장면, 멀리 낮은 산과 맑은 하늘, 부드러운 파스텔 일러스트 스타일, 흰색과 하늘색 위주의 차분한 색감, 가로 16:9 구도",{img:true}),
+     p("축제 포스터 (미션 ② 연계)","10대를 위한 '(철원 별빛 캠핑 축제)' 포스터, 밤하늘 은하수 아래 텐트와 반딧불이, 친구들이 웃으며 별을 보는 뒷모습, 밝은 플랫 일러스트 스타일, 남색과 노란색 대비, 세로 3:4 구도, 상단에 큰 제목 글자 '(철원 별빛 캠핑 축제)'",{img:true}),
+     p("미래 학교","2035년 AI 로봇 선생님과 함께 수업하는 고등학교 교실, 학생들이 홀로그램 화면을 보며 토론하는 장면, 큰 창밖으로 초록 들판, 밝고 깨끗한 3D 애니메이션 스타일, 하늘색과 흰색 위주, 정면 넓은 구도",{img:true}),
+     p("미래 철원","2040년 미래 도시가 된 철원, 스마트팜 유리 온실과 드론이 날아다니는 들판, 자연과 첨단 기술이 어우러진 모습, 공상과학 콘셉트 아트 스타일, 초록색과 은색, 하늘에서 내려다본 16:9 구도",{img:true}),
+     p("도전 · 철원 산업 융합","(플라즈마 기술)과 (농업)이 만난 미래 농장, 보라색 플라즈마 빛으로 씨앗을 처리하는 연구 장비, 공상과학 콘셉트 아트 스타일, 신비로운 분위기, 16:9",{img:true})
+   ]},
+   { step:"STEP 3", title:"스타일 바꾸기", sub:"2가지 골라 해 보기 · 3분", items:[
+     p("픽셀아트","방금 만든 이미지를 같은 장면 그대로 (픽셀아트) 스타일로 바꿔 줘."),
+     p("실사 사진","같은 장면을 (실사 사진)처럼 사실적으로 다시 만들어 줘."),
+     p("수묵화","같은 장면을 (한국 전통 수묵화) 느낌으로 바꿔 줘."),
+     p("클레이 애니메이션","같은 장면을 (클레이 애니메이션) 스타일로, 귀엽고 둥근 느낌으로 바꿔 줘.")
+   ]},
+   { step:"STEP 4", title:"수정 요청으로 완성하기", sub:"3분", items:[
+     p("부분 수정","하늘을 (노을)로 바꾸고, 오른쪽 아래에 (작은 강아지)를 추가해 줘. 나머지는 그대로 유지해 줘."),
+     p("글자 넣기","포스터 상단 제목을 '(철원 별빛 캠핑 축제)'로 크게, 하단에 '(2026. 10. 31. 토)'를 작게 넣어 줘."),
+     p("색감 바꾸기","전체 색감을 더 (밝고 경쾌하게) 바꿔 줘."),
+     p("인물 배치","사람 수를 (2명)으로 줄이고, 화면 가운데에 배치해 줘.")
+   ]}
+  ],
+  after:`
+  <div class="callout tip"><div><b>막혔을 때 체크</b> · 결과가 이상하면 공식 6요소(주제·장면·배경·스타일·분위기·구도) 중 빠진 것이 있는지 확인하고 하나씩 더해 보세요.</div></div>
+  <h3 class="step"><span class="s">단어</span>골라 쓰는 단어 모음 <small>누르면 단어가 복사돼요</small></h3>
+  <div class="words" id="words"></div>
+  <div class="callout"><div><b>주의</b> · 실존 인물·연예인·친구 얼굴, 유명 캐릭터·브랜드 로고는 넣지 않습니다. 완성 이미지는 <b>바탕화면에 저장</b>해 2교시에 다시 씁니다. 무료 계정은 하루 생성 횟수 제한이 있으니 3~5장 이내로 만들어요.</div></div>`
+},
+{ id:"fact", num:"4", nav:"팩트체크", title:"팩트체크 미션", kicker:["1교시","5분"],
+  goal:"AI도 틀릴 수 있다는 것을 직접 확인하고, <strong>검증하는 단계</strong>를 익힙니다.",
+  custom:"fact"
+},
+{ id:"career", num:"5", nav:"진로설계", title:"AI와 함께하는 진로 설계", kicker:["2교시","25분"],
+  goal:"4단계를 차례로 진행해 <strong>‘미래 나의 직업 카드’</strong>와 <strong>‘고교 로드맵’</strong>을 완성합니다. 한 대화창에서 이어서 하면 AI가 앞 내용을 기억해 더 잘 도와줘요.",
+  groups:[
+   { step:"STEP 1", title:"AI 진로 상담", sub:"8분", items:[
+     p("진로 상담 받기","너는 친절한 고등학교 진로 상담 선생님이야. 나는 철원에 사는 (고2) 학생이야. 내가 좋아하는 것은 (그림 그리기, 동물, 과학 실험)이고, 잘하는 과목은 (생명과학, 미술)이야. 성격은 (꼼꼼하고 조용한) 편이고, 나중에 (사람을 돕는) 일을 하고 싶어. 나에게 어울리는 미래 직업 5가지를 추천 이유, 하는 일, AI와의 관련성과 함께 표로 정리해 줘.",{good:true}),
+     p("진로가 아직 없다면","나는 (음악 듣기, 친구와 이야기하기, 요리)를 좋아해. 이것만으로 나에게 어울릴 만한 직업 5가지를 추천해 줘."),
+     p("이어가기","5개 중 (3번)이 궁금해. 이 직업의 장점과 힘든 점을 솔직하게 알려 줘.")
+   ]},
+   { step:"STEP 2", title:"미래 직업 융합", sub:"7분", items:[
+     p("2035년 새 직업 만들기","추천받은 직업 중 (수의사)에 AI 기술을 결합하면 2035년에는 어떤 새로운 직업이 생길까? 새 직업 이름 3가지를 만들고, 각각 하는 일, 필요한 능력, 사용하는 AI 기술을 표로 알려 줘.")
+   ]},
+   { step:"선택", title:"철원 지역 산업과 연결해 보기", sub:"운영기관 연계 분야", items:[
+     p("농축산","철원은 쌀과 축산이 유명한 지역이야. AI와 스마트팜 기술로 철원 농업이 어떻게 바뀔지 설명하고, 이 분야에서 생길 미래 직업 3가지를 알려 줘."),
+     p("농생명","농생명 바이오 분야에서 AI가 쓰이는 사례를 고등학생 눈높이로 3가지 설명하고, 관련 학과와 직업을 알려 줘."),
+     p("나노·소재","나노기술 연구에 AI가 어떻게 쓰이는지 쉬운 비유로 설명해 줘. 이 분야에 가려면 고등학교 때 어떤 과목을 공부하면 좋을까?"),
+     p("플라즈마","플라즈마 기술이 무엇인지 중학생도 알 수 있게 설명하고, 플라즈마와 AI가 만나 농업·환경·반도체에 어떻게 쓰일 수 있는지 알려 줘.")
+   ]},
+   { step:"STEP 3", title:"미래 나의 직업 카드 만들기", sub:"7분", items:[
+     p("① 글로 카드 내용 만들기","내가 정한 미래 직업은 (AI 헬스케어 코디네이터)야. 이 직업을 소개하는 '직업 카드'를 만들어 줘. 직업명, 한 줄 소개, 하는 일 3가지, 필요 역량 3가지, 관련 학과 2개, 2035년 나의 다짐 한 문장을 정리해 줘. 짧고 멋진 문장으로 써 줘."),
+     p("② 이미지로 ‘미래의 나’ 만들기","2035년 (첨단 병원)에서 (태블릿으로 환자의 AI 건강 데이터를 확인하는) 20대 한국인 여성 (AI 헬스케어 코디네이터), 밝은 미소, 깔끔한 업무복, 따뜻한 디지털 일러스트 스타일, (하늘색과 흰색) 색감, 상반신 구도",{img:true}),
+     p("직업 아이콘 버전","(AI 헬스케어 코디네이터)를 상징하는 단순한 아이콘, 흰 배경, 파스텔 톤 플랫 디자인, 정사각형 1:1",{img:true}),
+     p("직업 카드 한 장 버전","위 직업 카드 내용을 담은 세로형 카드 디자인 이미지, 상단에 직업명 '(AI 헬스케어 코디네이터)', 가운데 일러스트, 깔끔한 인포그래픽 스타일, 세로 3:4",{img:true})
+   ]},
+   { step:"STEP 4", title:"고교 로드맵", sub:"3분", items:[
+     p("학기별 로드맵","나는 (AI 헬스케어 코디네이터)가 되고 싶은 (고2) 학생이야. (고2 2학기)부터 고3까지 학기별로 읽으면 좋은 책 1권, 동아리·탐구 활동 1개, 집중할 과목, 지금 당장 할 수 있는 작은 실천 1가지를 표로 정리해 줘."),
+     p("이어가기","이 중 이번 주에 바로 시작할 수 있는 것 하나만 골라서, 구체적인 첫 행동을 알려 줘.")
+   ]}
+  ],
+  after:`<p class="result"><span>결과물</span>미래 나의 직업 카드(글 + 이미지) 1장, 고교 로드맵 표 1개 → 마무리 시간에 발표</p>
+  <div class="callout tip"><div><b>지도 포인트</b> · AI 추천을 그대로 쓰지 말고 “이 중 진짜 내 마음에 드는 것은?”을 스스로 골라 보세요.</div></div>`
+},
+{ id:"mine", num:"6", nav:"나만의 프롬프트", title:"나만의 프롬프트 만들기", kicker:["정리"],
+  goal:"칸을 채우면 아래에 <strong>프롬프트가 자동으로 완성</strong>돼요. 예시가 들어 있으니 내 내용으로 바꿔 쓰고 복사하세요.",
+  custom:"mine"
+}
+];
+
+const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const markup = s => esc(s).replace(/\(([^()]*)\)/g, '<mark class="fill">($1)</mark>');
+
+let jobName = "";
+try{ jobName = localStorage.getItem("cw-job") || ""; }catch(e){}
+
+function finalText(it){
+  let t = it.text;
+  if (it.job && jobName.trim()) t = t.replace(/\(직업명\)/g, jobName.trim());
+  return (it.img ? IMG : "") + t;
+}
+function cardHTML(it, key){
+  const tags = (it.bad?'<span class="tag-bad">대충 쓴 버전</span>':'') + (it.good?'<span class="tag-good">공식 적용</span>':'') + (it.img?'<span class="tag-img">이미지</span>':'');
+  let shown = it.text;
+  if (it.job && jobName.trim()) shown = shown.replace(/\(직업명\)/g, "("+jobName.trim()+")");
+  return `<article class="pcard${it.bad?' bad':''}">
+    <div class="top"><span class="label">${esc(it.label)}</span>${tags}</div>
+    <p class="ptext" data-k="${key}">${it.img?'<span class="prefix">'+esc(IMG.trim())+'</span>':''}${markup(shown)}</p>
+    <button class="copy" type="button" data-k="${key}">${COPY_ICON}<span>복사하기</span></button>
+  </article>`;
+}
+
+const REG = {}; // key -> item
+let kc = 0;
+function groupHTML(g){
+  if (g.job) g.items.forEach(i => i.job = true);
+  let h = "";
+  if (g.title) h += `<h3 class="step"><span class="s">${esc(g.step)}</span>${esc(g.title)}${g.sub?` <small>${esc(g.sub)}</small>`:''}</h3>`;
+  if (g.job) h += `<div class="jobbox"><label for="job">내 관심 직업</label><input type="text" id="job" placeholder="예: 간호사, 웹툰 작가, 수의사" value="${esc(jobName)}"><span class="note" style="margin:0;font-size:.9rem">입력하면 아래 (직업명)이 바뀌어요</span></div>`;
+  h += `<div class="grid">` + g.items.map(it => { const k = "k"+(kc++); REG[k]=it; return cardHTML(it,k); }).join("") + `</div>`;
+  if (g.note) h += `<p class="note">${esc(g.note)}</p>`;
+  return h;
+}
+
+function factHTML(){
+  const q = "철원군의 현재 인구는 몇 명이고, 철원의 대표 관광지 5곳과 각 장소의 역사적 의미를 알려 줘.";
+  const items = [
+    p("① 질문하기 · 정확한 숫자·사실을 묻기", q),
+    p("② 다른 AI에 묻기 · ChatGPT ↔ Gemini", q),
+    p("③ 출처 요청하기 · AI에게 근거 묻기","방금 알려 준 내용의 출처를 알려 줘. 확실하지 않거나 오래된 정보가 있으면 표시해 줘.")
+  ];
+  let h = `<h3 class="step"><span class="s">검증</span>교차 검증 단계</h3><div class="grid">` +
+    items.map(it => { const k="k"+(kc++); REG[k]=it; return cardHTML(it,k); }).join("") +
+    `<article class="pcard"><div class="top"><span class="label">④ 직접 확인하기</span></div><p class="ptext">철원군청 누리집, 통계청 등 <b>공식 사이트</b>에서 숫자를 직접 확인해요.</p><div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end"><a class="ghost" style="text-decoration:none" href="https://www.cwg.go.kr" target="_blank" rel="noopener">철원군청 ↗</a><a class="ghost" style="text-decoration:none" href="https://kosis.kr" target="_blank" rel="noopener">국가통계포털 ↗</a></div></article></div>
+    <p class="note">②번은 ①번과 같은 질문이에요. 다른 AI에 붙여 넣고 두 답을 비교해 보세요.</p>
+    <h3 class="step"><span class="s">구별</span>AI 이미지 구별하기 <small>방금 만든 이미지를 크게 확대해 보세요</small></h3>
+    <ul class="checks" data-store="cw-imgcheck">
+      <li><label><input type="checkbox" id="ic1">손가락 개수나 모양이 이상한가?</label></li>
+      <li><label><input type="checkbox" id="ic2">글자가 깨지거나 엉뚱한 글자가 들어 있는가?</label></li>
+      <li><label><input type="checkbox" id="ic3">그림자나 빛의 방향이 맞지 않는가?</label></li>
+      <li><label><input type="checkbox" id="ic4">배경 사물이 녹아내리듯 뭉개져 있는가?</label></li>
+    </ul>
+    <p class="quote">“AI는 똑똑한 친구지만,<br><em>최종 판단은 내가 한다</em>”</p>`;
+  return h;
+}
+
+const TXT_DEF = {
+  role:"너는 고등학생 진로 상담 선생님이야",
+  situ:"나는 철원에 사는 고2 학생이고 간호사에 관심이 있어",
+  req:"이 직업이 하는 일과 필요한 역량을 알려 줘",
+  fmt:"표로 정리하고, 고등학생이 이해하기 쉬운 말로 써 줘"
+};
+const IMG_DEF = {
+  subj:"가을 철원평야의 황금빛 논", scene:"철새 떼가 V자로 하늘을 나는 장면", bg:"멀리 보이는 한탄강 주상절리 협곡",
+  style:"따뜻한 수채화 스타일", mood:"노을빛 주황색 색감", comp:"가로로 넓은 16:9 구도"
+};
+function mineHTML(){
+  const f = (id,lab,hint,val) => `<div class="f"><label for="${id}">${lab}<small>${hint}</small></label><input type="text" id="${id}" value="${esc(val)}"></div>`;
+  return `<div class="split">
+   <div>
+    <h3 class="step"><span class="s">글쓰기</span>나만의 글쓰기 프롬프트</h3>
+    <div class="builder" id="bt">
+      ${f("t-role","역할","너는 ○○야",TXT_DEF.role)}
+      ${f("t-situ","상황","나는 ○○이고…",TXT_DEF.situ)}
+      ${f("t-req","요청","○○을 해 줘",TXT_DEF.req)}
+      ${f("t-fmt","형식","표 / 5가지 / 300자",TXT_DEF.fmt)}
+      <div class="preview"><p class="ptext" id="t-out"></p>
+        <div class="brow"><button class="ghost" type="button" data-clear="bt">칸 비우기</button><button class="copy" type="button" data-k="t-out">${COPY_ICON}<span>복사하기</span></button></div></div>
+    </div>
+   </div>
+   <div>
+    <h3 class="step"><span class="s">이미지</span>나만의 이미지 프롬프트</h3>
+    <div class="builder" id="bi">
+      ${f("i-subj","주제","무엇을",IMG_DEF.subj)}
+      ${f("i-scene","장면·행동","무엇을 하는",IMG_DEF.scene)}
+      ${f("i-bg","배경","어디서",IMG_DEF.bg)}
+      ${f("i-style","스타일","수채화, 3D…",IMG_DEF.style)}
+      ${f("i-mood","분위기·색감","따뜻한, 파스텔…",IMG_DEF.mood)}
+      ${f("i-comp","구도(비율)","16:9, 3:4, 1:1",IMG_DEF.comp)}
+      <div class="preview"><p class="ptext" id="i-out"></p>
+        <div class="brow"><button class="ghost" type="button" data-clear="bi">칸 비우기</button><button class="copy" type="button" data-k="i-out">${COPY_ICON}<span>복사하기</span></button></div></div>
+    </div>
+   </div>
+  </div>
+  <div class="split" style="margin-top:.6rem">
+   <div>
+    <h3 class="step"><span class="s">체크</span>오늘의 셀프 체크리스트</h3>
+    <ul class="checks" data-store="cw-self">
+      <li><label><input type="checkbox" id="sc1">프롬프트 공식(역할 + 상황 + 요청 + 형식)으로 질문해 봤다</label></li>
+      <li><label><input type="checkbox" id="sc2">대화 이어가기로 답을 한 번 이상 고쳐 봤다</label></li>
+      <li><label><input type="checkbox" id="sc3">이미지 프롬프트 공식으로 이미지를 만들고 스타일을 바꿔 봤다</label></li>
+      <li><label><input type="checkbox" id="sc4">AI 답변을 다른 AI나 공식 사이트로 확인해 봤다</label></li>
+      <li><label><input type="checkbox" id="sc5">‘미래 나의 직업 카드’와 ‘고교 로드맵’을 완성했다</label></li>
+      <li><label><input type="checkbox" id="sc6">개인정보와 다른 사람 얼굴을 입력하지 않았다</label></li>
+    </ul>
+   </div>
+   <div>
+    <h3 class="step"><span class="s">다짐</span>AI 리터러시·윤리 수칙</h3>
+    <ol class="ethics">
+      <li><span><b>검증한다</b>AI 답변은 다른 AI와 공식 출처로 한 번 더 확인한다.</span></li>
+      <li><span><b>내 생각을 더한다</b>AI 결과를 그대로 제출하지 않고, 내 생각과 표현으로 다시 쓴다.</span></li>
+      <li><span><b>개인정보를 지킨다</b>이름, 전화번호, 주소, 친구 사진을 AI에 입력하지 않는다.</span></li>
+      <li><span><b>밝힌다</b>과제·발표에 AI를 썼다면 어디에 어떻게 썼는지 표시한다.</span></li>
+      <li><span><b>존중한다</b>다른 사람의 얼굴·목소리·작품으로 장난이나 가짜 콘텐츠를 만들지 않는다.</span></li>
+    </ol>
+   </div>
+  </div>`;
+}
+
+/* ── 렌더 ── */
+const main = document.getElementById("main"), tabs = document.getElementById("tabs");
+main.innerHTML = SECTIONS.map(s => {
+  let h = `<section id="${s.id}"><div class="sec-head"><div class="sec-num">${s.num}</div>
+    <div class="sec-kicker">${s.kicker.map((k,i)=>`<span class="chip${/분$/.test(k)?' time':''}">${k}</span>`).join("")}</div>
+    <h2>${s.title}</h2><p class="goal">${s.goal}</p></div>`;
+  if (s.html) h += s.html;
+  if (s.groups) h += s.groups.map(groupHTML).join("");
+  if (s.custom==="fact") h += factHTML();
+  if (s.custom==="mine") h += mineHTML();
+  if (s.after) h += s.after;
+  return h + `</section>`;
+}).join("");
+tabs.innerHTML = SECTIONS.map(s => `<a href="#${s.id}" data-id="${s.id}"><b>${s.num}</b>${s.nav}</a>`).join("");
+
+/* 단어 모음 */
+const WORDS = [
+  ["스타일","수채화, 유화, 연필 스케치, 플랫 일러스트, 3D 애니메이션, 픽셀아트, 실사 사진, 수묵화, 클레이 애니메이션, 팝아트, 웹툰"],
+  ["분위기·색감","따뜻한, 신비로운, 밝고 경쾌한, 차분한, 노을빛, 파스텔 톤, 네온, 흑백, 빈티지"],
+  ["구도·비율","가로 16:9, 세로 3:4, 정사각형 1:1, 정면, 위에서 내려다본, 가까이 클로즈업, 넓은 풍경"]
+];
+document.getElementById("words").innerHTML = WORDS.map(([k,v]) =>
+  `<div class="row"><b>${k}</b><div class="wchips">${v.split(", ").map(w=>`<button type="button" class="w">${w}</button>`).join("")}</div></div>`).join("");
+
+/* 빌더 */
+const val = id => document.getElementById(id).value.trim().replace(/[.。\s]+$/,"");
+function buildText(){
+  const parts = ["t-role","t-situ","t-req","t-fmt"].map(val).filter(Boolean);
+  document.getElementById("t-out").textContent = parts.length ? parts.join(". ")+"." : "칸을 채우면 여기에 프롬프트가 완성돼요.";
+}
+function buildImg(){
+  const parts = ["i-subj","i-scene","i-bg","i-style","i-mood","i-comp"].map(val).filter(Boolean);
+  const out = document.getElementById("i-out");
+  out.innerHTML = parts.length ? `<span class="prefix">${esc(IMG.trim())}</span>${esc(parts.join(", "))}` : "칸을 채우면 여기에 프롬프트가 완성돼요.";
+}
+document.getElementById("bt").addEventListener("input", buildText);
+document.getElementById("bi").addEventListener("input", buildImg);
+buildText(); buildImg();
+
+/* 직업명 입력 */
+const jobInput = document.getElementById("job");
+if (jobInput) jobInput.addEventListener("input", () => {
+  jobName = jobInput.value;
+  try{ localStorage.setItem("cw-job", jobName); }catch(e){}
+  document.querySelectorAll("#m1 p.ptext").forEach(el => {
+    const it = REG[el.dataset.k]; if (!it || !it.job) return;
+    const shown = jobName.trim() ? it.text.replace(/\(직업명\)/g,"("+jobName.trim()+")") : it.text;
+    el.innerHTML = markup(shown);
+  });
+});
+
+/* 복사 */
+const toast = document.getElementById("toast"); let tt;
+function showToast(msg){ toast.textContent = msg; toast.classList.add("show"); clearTimeout(tt); tt = setTimeout(()=>toast.classList.remove("show"), 2200); }
+function fallbackCopy(text){
+  const ta = document.getElementById("clip"); ta.value = text; ta.removeAttribute("aria-hidden");
+  ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try{ ok = document.execCommand("copy"); }catch(e){}
+  ta.setAttribute("aria-hidden","true"); return ok;
+}
+function doCopy(text, btn, msg){
+  const done = ok => {
+    if (ok){
+      showToast(msg || "복사했어요! AI 입력창에 붙여 넣으세요 (Ctrl+V)");
+      if (btn){ btn.classList.add("done"); const sp = btn.querySelector("span"); const old = sp ? sp.textContent : null;
+        if (sp) sp.textContent = "복사됨 ✓"; setTimeout(()=>{ btn.classList.remove("done"); if (sp) sp.textContent = old; }, 1600); }
+    } else showToast("복사가 안 됐어요. 글자를 길게 눌러 직접 복사해 주세요.");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>done(true), ()=>done(fallbackCopy(text)));
+  } else done(fallbackCopy(text));
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button.copy");
+  if (b){
+    const k = b.dataset.k;
+    let text;
+    if (k==="t-out") text = document.getElementById("t-out").textContent;
+    else if (k==="i-out") text = IMG + ["i-subj","i-scene","i-bg","i-style","i-mood","i-comp"].map(val).filter(Boolean).join(", ");
+    else text = finalText(REG[k]);
+    doCopy(text, b); return;
+  }
+  const w = e.target.closest("button.w");
+  if (w){ doCopy(w.textContent, null, `‘${w.textContent}’ 복사했어요`); w.classList.add("done"); setTimeout(()=>w.classList.remove("done"),1200); return; }
+  const c = e.target.closest("[data-clear]");
+  if (c){ document.querySelectorAll("#"+c.dataset.clear+" input").forEach(i=>i.value=""); buildText(); buildImg(); document.querySelector("#"+c.dataset.clear+" input").focus(); }
+});
+
+/* 체크리스트 저장 */
+document.querySelectorAll(".checks[data-store]").forEach(ul => {
+  const key = ul.dataset.store; let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem(key) || "{}"); }catch(e){}
+  ul.querySelectorAll("input").forEach(i => {
+    i.checked = !!saved[i.id];
+    i.addEventListener("change", () => { saved[i.id] = i.checked; try{ localStorage.setItem(key, JSON.stringify(saved)); }catch(e){} });
+  });
+});
+
+/* 탭 활성화 */
+const links = [...tabs.querySelectorAll("a")];
+const io = new IntersectionObserver(ents => {
+  ents.forEach(en => { if (en.isIntersecting){
+    links.forEach(a => a.classList.toggle("on", a.dataset.id === en.target.id));
+    const on = tabs.querySelector("a.on"); if (on) on.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
+  }});
+}, { rootMargin:"-40% 0px -55% 0px" });
+document.querySelectorAll("main section").forEach(s => io.observe(s));
+links[0].classList.add("on");
+if (location.hash){ const t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(()=>t.scrollIntoView(), 50); }
+
+/* 별 */
+const cv = document.getElementById("stars");
+function stars(){
+  const r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio||1, 2);
+  cv.width = r.width*d; cv.height = r.height*d; const x = cv.getContext("2d"); x.scale(d,d);
+  let seed = 7; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
+  const n = Math.round(r.width*r.height/5000);
+  for (let i=0;i<n;i++){ x.fillStyle = `rgba(244,241,228,${0.25+rnd()*0.6})`; x.beginPath(); x.arc(rnd()*r.width, rnd()*r.height*0.8, rnd()*1.3+0.3, 0, Math.PI*2); x.fill(); }
+}
+stars(); let rz; addEventListener("resize", ()=>{ clearTimeout(rz); rz = setTimeout(stars, 150); });
+})();
+</script>
+
+</body></html>
