@@ -194,6 +194,22 @@ input[type=text]:focus{outline:none;border-color:var(--gold-deco);box-shadow:0 0
 .ethics li{counter-increment:e;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;align-items:baseline;font-size:1.06rem}
 .ethics li::before{content:counter(e);font-family:var(--f-display);font-weight:900;font-size:1.6rem;color:var(--gold-deco);text-align:center}
 .ethics b{margin-right:.35rem}
+.kchips{display:flex;flex-wrap:wrap;gap:.5rem}
+.kw{background:var(--surface);border:1px solid var(--line-strong);color:var(--ink);border-radius:999px;padding:.5rem 1.05rem;font-size:1.02rem;font-weight:500;min-height:44px;transition:background .15s,border-color .15s,color .15s}
+.kw:hover{border-color:var(--gold-deco)}
+.kw[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn);font-weight:800}
+.kw[aria-pressed="true"]::before{content:"✓ "}
+.review-top{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem}
+.exkw{background:var(--gold-soft);border-radius:14px;padding:.9rem 1rem;display:grid;gap:.3rem}
+.exkw > span{font-weight:800;color:var(--gold)}
+.exkw > small{color:var(--muted);font-size:.88rem}
+.exkw .wchips{margin-top:.4rem}
+.exk{background:var(--surface);border:1px dashed var(--gold-deco);color:var(--ink);border-radius:999px;padding:.38rem .9rem;font-size:.98rem}
+.exk::before{content:"+ ";color:var(--gold)}
+.exk:hover{border-style:solid}
+.review-out{background:var(--surface);border:1px solid var(--gold-deco);border-radius:18px;padding:1.4rem 1.4rem 1.1rem;display:grid;gap:.9rem;box-shadow:var(--shadow)}
+.review-out .ptext{font-size:1.15rem;line-height:1.95}
+.review-out .ptext.empty{color:var(--muted)}
 .split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:1.4rem}
 
 footer{margin-top:2rem;background:var(--band);color:var(--band-muted);font-size:.9rem}
@@ -410,6 +426,10 @@ const SECTIONS = [
 { id:"mine", num:"6", nav:"나만의 프롬프트", title:"나만의 프롬프트 만들기", kicker:["정리"],
   goal:"칸을 채우면 아래에 <strong>프롬프트가 자동으로 완성</strong>돼요. 예시가 들어 있으니 내 내용으로 바꿔 쓰고 복사하세요.",
   custom:"mine"
+},
+{ id:"review", num:"7", nav:"교육후기", title:"오늘의 교육 후기 만들기", kicker:["마무리"],
+  goal:"키워드를 <strong>눌러서 고르면</strong> 아래에 교육 후기 문장이 <strong>자동으로 완성</strong>돼요. 여러 개 골라도 되고, 다시 누르면 빠져요. 완성된 후기는 복사해서 강의평가에 붙여 넣으세요.",
+  custom:"review"
 }
 ];
 
@@ -508,6 +528,7 @@ function mineHTML(){
       <li><label><input type="checkbox" id="sc5">‘미래 나의 직업 카드’와 ‘고교 로드맵’을 완성했다</label></li>
       <li><label><input type="checkbox" id="sc6">개인정보와 다른 사람 얼굴을 입력하지 않았다</label></li>
     </ul>
+    <div class="brow" style="margin-top:.9rem"><span class="note" id="selfCount" style="margin:0;font-weight:700">0 / 6 완료</span><button class="copy" type="button" id="copySelf">${COPY_ICON}<span>체크 결과 복사하기</span></button></div>
    </div>
    <div>
     <h3 class="step"><span class="s">다짐</span>AI 리터러시·윤리 수칙</h3>
@@ -522,6 +543,115 @@ function mineHTML(){
   </div>`;
 }
 
+/* ── 교육 후기 ── */
+const REVIEW = [
+  { key:"feel", step:"키워드 ①", title:"오늘 수업은 어땠나요?", items:[
+    {k:"재미있었어요", c:"재미있고", a:"재미있는"},
+    {k:"유익했어요", c:"유익하고", a:"유익한"},
+    {k:"신기했어요", c:"신기하고", a:"신기한"},
+    {k:"이해하기 쉬웠어요", c:"이해하기 쉽고", a:"이해하기 쉬운"},
+    {k:"시간이 빨리 갔어요", c:"시간 가는 줄 모를 만큼 흥미롭고", a:"시간 가는 줄 모를 만큼 흥미로운"},
+    {k:"실용적이었어요", c:"바로 쓸 수 있을 만큼 실용적이고", a:"바로 쓸 수 있을 만큼 실용적인"},
+    {k:"뿌듯했어요", c:"뿌듯하고", a:"뿌듯한"},
+    {k:"조금 어려웠어요", c:"조금 어렵기도 했지만", a:"조금 어려웠지만 해 볼 만한", first:true}
+  ]},
+  { key:"best", step:"키워드 ②", title:"가장 기억에 남는 활동은?", items:[
+    {k:"프롬프트 비교 실험", r:"대충 쓴 질문과 공식대로 쓴 질문의 답이 확 달라지는 것을 직접 보고 놀랐다."},
+    {k:"진로 정보 조사", r:"관심 있는 직업의 하는 일과 관련 학과를 표로 정리하니 진로가 더 구체적으로 보였다."},
+    {k:"철원 축제 기획", r:"철원의 자연과 농산물을 활용한 축제 아이디어를 AI와 함께 만들어 보는 것이 재미있었다."},
+    {k:"이미지 만들기", r:"내가 상상한 장면이 그림으로 나오는 것이 정말 신기했다."},
+    {k:"스타일 바꾸기", r:"같은 장면이 수채화, 픽셀아트, 수묵화로 바뀌는 것이 흥미로웠다."},
+    {k:"팩트체크 미션", r:"AI 답변을 다른 AI와 공식 사이트로 확인해 보니 틀린 부분도 있다는 것을 알게 됐다."},
+    {k:"미래 직업 카드", r:"AI를 결합한 2035년 나의 직업을 직접 만들어 보니 미래가 기대되었다."},
+    {k:"고교 로드맵", r:"고등학교 때 무엇을 준비해야 할지 학기별로 정리할 수 있어서 도움이 되었다."}
+  ]},
+  { key:"learn", step:"키워드 ③", title:"새롭게 알게 된 점은?", items:[
+    {k:"질문을 잘해야 한다", s:"AI에게 역할·상황·요청·형식을 갖춰 질문해야 좋은 답이 나온다는 것"},
+    {k:"AI도 틀릴 수 있다", s:"AI도 그럴듯하게 틀린 정보를 말할 수 있다는 것"},
+    {k:"새로운 직업이 생긴다", s:"AI 때문에 줄어드는 일도 있지만 새로 생기는 직업도 많다는 것"},
+    {k:"철원 산업과 AI", s:"철원의 농축산·농생명·나노·플라즈마 분야에도 AI가 쓰인다는 것"},
+    {k:"AI가 답을 만드는 원리", s:"생성형 AI가 다음에 올 단어를 예측해서 답을 만든다는 것"},
+    {k:"개인정보 지키기", s:"AI에 내 개인정보나 친구 얼굴을 넣으면 안 된다는 것"}
+  ]},
+  { key:"plan", step:"키워드 ④", title:"앞으로의 다짐은?", items:[
+    {k:"공부에 활용하기", s:"공부할 때 AI를 똑똑한 도우미로 활용해 보"},
+    {k:"진로 탐색하기", s:"내 진로를 AI와 함께 더 깊이 탐색해 보"},
+    {k:"꼭 검증하기", s:"AI 답변은 꼭 다른 출처로 확인하"},
+    {k:"내 생각 더하기", s:"AI 결과에 내 생각과 표현을 더해서 쓰"},
+    {k:"친구에게 알려 주기", s:"오늘 배운 프롬프트 공식을 친구들에게도 알려 주"},
+    {k:"영상·음악 AI 도전", s:"다음에는 영상과 음악을 만드는 AI에도 도전해 보"}
+  ]},
+  { key:"score", step:"키워드 ⑤", title:"오늘 수업 만족도는?", single:true, items:[
+    {k:"★★★★★ 매우 만족", s:"오늘 수업에는 5점 만점에 5점을 주고 싶다. 다른 친구들에게도 꼭 추천하고 싶은 수업이다."},
+    {k:"★★★★ 만족", s:"오늘 수업에는 5점 만점에 4점을 주고 싶다."},
+    {k:"★★★ 보통", s:"오늘 수업에는 5점 만점에 3점을 주고 싶다."}
+  ]}
+];
+const EX_KW = ["상상이 현실로","미래가 기대돼","진로 고민 해결","AI 꿀팁","생각보다 쉬움","신세계","또 듣고 싶어","친절한유성쌤","철원 자부심","질문의 힘","나도 크리에이터","팩트체크 필수"];
+const EX_FILL = { feel:["재미있었어요","유익했어요"], best:["이미지 만들기","미래 직업 카드"], learn:["질문을 잘해야 한다","AI도 틀릴 수 있다"], plan:["진로 탐색하기","꼭 검증하기"], score:["★★★★★ 매우 만족"], tags:"상상이 현실로, 미래가 기대돼", line:"" };
+
+function reviewHTML(){
+  const groups = REVIEW.map(g => `<h3 class="step"><span class="s">${g.step}</span>${g.title} <small>${g.single?"하나만 고르기":"여러 개 고를 수 있어요"}</small></h3>
+    <div class="kchips" data-g="${g.key}">${g.items.map(it => `<button type="button" class="kw" aria-pressed="false" data-g="${g.key}" data-k="${esc(it.k)}">${esc(it.k)}</button>`).join("")}</div>`).join("");
+  return `<div class="review-top"><button class="ghost" type="button" id="rvExample">예시로 한 번에 채워 보기</button><button class="ghost" type="button" id="rvReset">처음부터 다시</button></div>
+  ${groups}
+  <h3 class="step"><span class="s">키워드 ⑥</span>내 키워드 직접 넣기 <small>선택 · 쉼표(,)로 여러 개</small></h3>
+  <div class="builder">
+    <div class="f"><label for="rv-tags">내 키워드<small>예: 신세계, AI 꿀팁</small></label><input type="text" id="rv-tags" placeholder="오늘 수업을 표현하는 내 말"></div>
+    <div class="exkw"><span>예시 키워드</span><small>뭘 써야 할지 모르겠다면 눌러서 넣어 보세요</small>
+      <div class="wchips">${EX_KW.map(w=>`<button type="button" class="exk">${w}</button>`).join("")}</div></div>
+    <div class="f"><label for="rv-line">한 줄 소감<small>선택</small></label><input type="text" id="rv-line" placeholder="예: 다음에는 AI로 노래도 만들어 보고 싶다"></div>
+  </div>
+  <h3 class="step"><span class="s">완성</span>나의 교육 후기</h3>
+  <div class="review-out">
+    <p class="ptext" id="rv-out"></p>
+    <div class="brow"><span class="note" id="rv-count" style="margin:0"></span><button class="copy" type="button" id="copyReview">${COPY_ICON}<span>후기 복사하기</span></button></div>
+  </div>`;
+}
+
+const hasJong = w => { const c = w.trim().slice(-1).charCodeAt(0); if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 !== 0; return /[136780lmnr]$/i.test(w.trim()); };
+const josa = (w, a, b) => w + (hasJong(w) ? a : b);
+const listKo = arr => arr.length < 2 ? (arr[0]||"") : arr.slice(0,-1).join(", ") + ", 그리고 " + arr[arr.length-1];
+let RV = { feel:[], best:[], learn:[], plan:[], score:[] };
+try{ const s = JSON.parse(localStorage.getItem("cw-review") || "null"); if (s) RV = Object.assign(RV, s); }catch(e){}
+const pick = key => { const g = REVIEW.find(x => x.key===key); return g.items.filter(it => RV[key].includes(it.k)); };
+
+function reviewText(){
+  const out = [];
+  const feel = pick("feel").sort((a,b) => (b.first?1:0) - (a.first?1:0));
+  const best = pick("best"), learn = pick("learn"), plan = pick("plan"), score = pick("score");
+  const tags = document.getElementById("rv-tags").value.split(/[,，]/).map(t => t.trim().replace(/^#/, "").replace(/\s+/g, "")).filter(Boolean);
+  const line = document.getElementById("rv-line").value.trim();
+  if (!feel.length && !best.length && !learn.length && !plan.length && !score.length && !tags.length && !line) return "";
+  out.push("오늘 학교에서 김유성 선생님(친절한유성쌤)의 ‘AI 활용법 및 AI 시대의 직업군’ 수업을 들었다.");
+  if (feel.length){
+    const last = feel[feel.length-1];
+    out.push("수업은 한마디로 " + feel.slice(0,-1).map(f => f.c).concat(last.a).join(" ") + " 시간이었다.");
+  }
+  if (best.length){
+    const names = best.map(b => b.k);
+    let subj;
+    if (names.length === 1) subj = josa(names[0], "이", "가");
+    else subj = names.slice(0,-2).map(n => n + ", ").join("") + josa(names[names.length-2], "과", "와") + " " + josa(names[names.length-1], "이", "가");
+    out.push("특히 " + subj + " 가장 기억에 남는다. " + best.map(b => b.r).join(" "));
+  }
+  if (learn.length) out.push("수업을 통해 " + listKo(learn.map(l => l.s)) + "을 새롭게 알게 되었다.");
+  if (plan.length) out.push("앞으로는 " + plan.map(p2 => p2.s).join("고, ") + "고 싶다.");
+  if (tags.length) out.push("오늘 수업을 키워드로 표현하면 " + tags.map(t => "#" + t).join(" ") + "!");
+  if (line) out.push(/[.!?。]$/.test(line) ? line : line + ".");
+  if (score.length) out.push(score[0].s);
+  out.push("좋은 수업 해 주셔서 감사합니다!");
+  return out.join(" ");
+}
+function renderReview(){
+  document.querySelectorAll("button.kw").forEach(b => b.setAttribute("aria-pressed", RV[b.dataset.g].includes(b.dataset.k) ? "true" : "false"));
+  const t = reviewText(), el = document.getElementById("rv-out");
+  el.textContent = t || "위에서 키워드를 고르면 여기에 교육 후기가 만들어져요.";
+  el.classList.toggle("empty", !t);
+  document.getElementById("rv-count").textContent = t ? `총 ${t.length}자` : "";
+  try{ localStorage.setItem("cw-review", JSON.stringify(RV)); localStorage.setItem("cw-review-txt", JSON.stringify({tags:document.getElementById("rv-tags").value, line:document.getElementById("rv-line").value})); }catch(e){}
+}
+
 /* ── 렌더 ── */
 const main = document.getElementById("main"), tabs = document.getElementById("tabs");
 main.innerHTML = SECTIONS.map(s => {
@@ -532,6 +662,7 @@ main.innerHTML = SECTIONS.map(s => {
   if (s.groups) h += s.groups.map(groupHTML).join("");
   if (s.custom==="fact") h += factHTML();
   if (s.custom==="mine") h += mineHTML();
+  if (s.custom==="review") h += reviewHTML();
   if (s.after) h += s.after;
   return h + `</section>`;
 }).join("");
@@ -560,6 +691,35 @@ const WORDS = [
 ];
 document.getElementById("words").innerHTML = WORDS.map(([k,v]) =>
   `<div class="row"><b>${k}</b><div class="wchips">${v.split(", ").map(w=>`<button type="button" class="w">${w}</button>`).join("")}</div></div>`).join("");
+
+/* 교육 후기 초기화 */
+try{ const s = JSON.parse(localStorage.getItem("cw-review-txt") || "null"); if (s){ document.getElementById("rv-tags").value = s.tags || ""; document.getElementById("rv-line").value = s.line || ""; } }catch(e){}
+document.getElementById("review").addEventListener("input", renderReview);
+document.getElementById("review").addEventListener("click", e => {
+  const b = e.target.closest("button.kw");
+  if (b){
+    const g = REVIEW.find(x => x.key===b.dataset.g), k = b.dataset.k, arr = RV[g.key];
+    if (arr.includes(k)) RV[g.key] = arr.filter(x => x!==k);
+    else RV[g.key] = g.single ? [k] : arr.concat(k);
+    renderReview(); return;
+  }
+  const x = e.target.closest("button.exk");
+  if (x){
+    const inp = document.getElementById("rv-tags"), cur = inp.value.split(/[,，]/).map(t=>t.trim()).filter(Boolean);
+    if (!cur.includes(x.textContent)) cur.push(x.textContent);
+    inp.value = cur.join(", "); renderReview(); return;
+  }
+  if (e.target.closest("#rvExample")){
+    REVIEW.forEach(g => RV[g.key] = EX_FILL[g.key].slice());
+    document.getElementById("rv-tags").value = EX_FILL.tags; renderReview();
+    showToast("예시가 채워졌어요. 내 생각에 맞게 바꿔 보세요"); return;
+  }
+  if (e.target.closest("#rvReset")){
+    REVIEW.forEach(g => RV[g.key] = []);
+    document.getElementById("rv-tags").value = ""; document.getElementById("rv-line").value = ""; renderReview();
+  }
+});
+renderReview();
 
 /* 빌더 */
 const val = id => document.getElementById(id).value.trim().replace(/[.。\s]+$/,"");
@@ -629,6 +789,8 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button.copy");
   if (b){
     const k = b.dataset.k; let text;
+    if (b.id==="copyReview"){ const t = reviewText(); if (!t){ showToast("먼저 위에서 키워드를 골라 주세요"); return; } doCopy(t, b, "후기를 복사했어요! 강의평가란에 붙여 넣으세요"); return; }
+    if (b.id==="copySelf"){ doCopy(selfText(), b, "체크 결과를 복사했어요! 메모장이나 과제란에 붙여 넣으세요"); return; }
     if (k==="t-out") text = document.getElementById("t-out").textContent;
     else if (k==="i-out") text = IMG + IMG_IDS.map(val).filter(Boolean).join(", ");
     else text = finalText(REG[k]);
@@ -651,9 +813,19 @@ document.querySelectorAll(".checks[data-store]").forEach(ul => {
   try{ saved = JSON.parse(localStorage.getItem(key) || "{}"); }catch(e){}
   ul.querySelectorAll("input").forEach(i => {
     i.checked = !!saved[i.id];
-    i.addEventListener("change", () => { saved[i.id] = i.checked; try{ localStorage.setItem(key, JSON.stringify(saved)); }catch(e){} });
+    i.addEventListener("change", () => { saved[i.id] = i.checked; try{ localStorage.setItem(key, JSON.stringify(saved)); }catch(e){} updateSelf(); });
   });
 });
+
+/* 셀프 체크 결과 복사 */
+const selfItems = () => [...document.querySelectorAll('.checks[data-store="cw-self"] input')];
+function updateSelf(){ const all = selfItems(), n = all.filter(i=>i.checked).length; document.getElementById("selfCount").textContent = `${n} / ${all.length} 완료`; }
+function selfText(){
+  const all = selfItems(), n = all.filter(i=>i.checked).length;
+  const lines = all.map(i => (i.checked ? "☑ " : "☐ ") + i.parentElement.textContent.trim());
+  return `[오늘의 셀프 체크리스트] ${n}/${all.length} 완료\n` + lines.join("\n");
+}
+updateSelf();
 
 /* 현재 섹션 표시 */
 const links = [...tabs.querySelectorAll("a")];
