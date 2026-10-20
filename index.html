@@ -7,7 +7,7 @@
 <style>
 /* Layout: 철원의 밤하늘(딥 네이비) + 가을 들판(샴페인 골드) — 명조 제목·고딕 본문, 교시 순서대로 흐르는 섹션과 복사 카드 */
 :root{
-  --bg:#F2F3F5; --surface:#FFFFFF; --surface-2:#F8F8F9; --ink:#0F1B2D; --muted:#596377; --line:#E0E3E9; --line-strong:#CBD0DA;
+  --bg:#F2F3F5; --surface:#FFFFFF; --surface-2:#F8F8F9; --ink:#0F1B2D; --muted:#4B5568; --line:#E0E3E9; --line-strong:#CBD0DA;
   --band:#0B1626; --band-2:#14243B; --band-ink:#F3EEE2; --band-muted:#AEB8CB;
   --gold:#8E6A2C; --gold-deco:#C9A45C; --gold-soft:#F4EDDF;
   --btn:#0F1B2D; --btn-ink:#EBD7A8; --btn-hover:#1C2D47;
@@ -40,7 +40,7 @@ html{font-size:17px;scroll-padding-top:80px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;-webkit-text-size-adjust:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
-.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1,h2,h3{text-wrap:balance;margin:0}
 button{font:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--gold-deco);outline-offset:3px;border-radius:6px}
@@ -63,9 +63,10 @@ button{font:inherit;cursor:pointer}
 
 /* ── 고정 내비 ── */
 .navbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 6px 16px -14px rgba(15,27,45,.35)}
-.tabs{display:flex;gap:.3rem;overflow-x:auto;padding-block:.65rem;scrollbar-width:none}
+.navbar .wrap{max-width:1040px}
+.tabs{display:flex;justify-content:center;gap:.2rem;overflow-x:auto;padding-block:.65rem;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs a{flex:0 0 auto;display:flex;align-items:center;gap:.45rem;text-decoration:none;color:var(--muted);font-weight:700;font-size:.92rem;padding:.42rem .95rem;border-radius:999px;border:1px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
+.tabs a{flex:0 0 auto;display:flex;align-items:center;gap:.35rem;text-decoration:none;color:var(--muted);font-weight:700;font-size:.86rem;padding:.38rem .75rem;border-radius:999px;border:1px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
 .tabs a b{font-family:var(--f-display);font-weight:700;color:var(--gold)}
 .tabs a:hover{color:var(--ink);border-color:var(--line-strong)}
 .tabs a.on{background:var(--ink);color:var(--bg)}
@@ -76,14 +77,15 @@ button{font:inherit;cursor:pointer}
 .mbar .cur span{overflow:hidden;text-overflow:ellipsis}
 .tocbtn{flex:0 0 auto;display:inline-flex;align-items:center;gap:.5rem;background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:.55rem 1.05rem;font-weight:800;font-size:.95rem;min-height:44px}
 .tocbtn svg{width:1.1em;height:1.1em}
-@media (max-width:899px){.tabs{display:none}.mbar{display:flex}}
+@media (max-width:1079px){.tabs{display:none}.mbar{display:flex}}
+@media (max-width:1079px){.navbar .wrap{max-width:760px}}
 
 /* ── 목차(본문) ── */
 .toc{padding-block:2.4rem .4rem}
 .toc-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:1rem}
 .toc-head h2{font-family:var(--f-display);font-weight:900;font-size:1.5rem}
 .toc-head small{color:var(--muted);font-size:.88rem}
-.toc ol{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:.6rem}
+.toc ol{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr;gap:.55rem}
 .toc a{display:grid;grid-template-columns:2.2rem 1fr auto;gap:.8rem;align-items:center;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.85rem 1rem;box-shadow:var(--shadow);transition:border-color .2s,transform .2s}
 .toc a:hover{border-color:var(--gold-deco);transform:translateY(-1px)}
 .toc a > b{font-family:var(--f-display);font-weight:900;font-size:1.6rem;color:var(--gold);text-align:center;line-height:1}
@@ -111,27 +113,27 @@ button{font:inherit;cursor:pointer}
 .dtoc ul a:hover,.dtoc > li > a:hover{color:var(--gold)}
 
 /* ── 섹션 ── */
-main section{padding-block:3.2rem 1.4rem;border-top:1px solid var(--line)}
+main section{padding-block:4rem 2rem;border-top:1px solid var(--line)}
 .sec-head{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1.1rem;align-items:end;margin-bottom:.4rem}
-.sec-num{grid-row:span 2;font-family:var(--f-display);font-weight:900;font-size:clamp(3.4rem,10vw,4.8rem);line-height:.9;color:var(--gold-deco)}
+.sec-num{grid-row:span 2;font-family:var(--f-display);font-weight:900;font-size:clamp(3rem,9vw,3.8rem);line-height:.9;color:var(--gold-deco)}
 .sec-kicker{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
 .chip{display:inline-block;font-size:.76rem;font-weight:700;padding:.1rem .7rem;border-radius:999px;border:1px solid var(--gold-deco);color:var(--gold);letter-spacing:.06em}
 .chip.time{border-color:transparent;background:var(--rose-soft);color:var(--rose)}
 .sec-head h2{font-family:var(--f-display);font-weight:900;font-size:clamp(1.75rem,4.8vw,2.5rem);line-height:1.25;letter-spacing:-.015em}
-.goal{grid-column:1/-1;margin:1rem 0 0;color:var(--muted);font-size:1.06rem;max-width:62ch}
+.goal{grid-column:1/-1;margin:1.1rem 0 0;color:var(--muted);font-size:1.08rem;line-height:1.85;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1rem 1.15rem}
 .goal strong{color:var(--ink)}
-h3.step{display:flex;flex-direction:column;gap:.15rem;font-family:var(--f-display);font-weight:700;font-size:1.32rem;margin:2.4rem 0 1rem;padding-top:1rem;border-top:1px dashed var(--line-strong)}
+h3.step{display:flex;flex-direction:column;gap:.2rem;font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.45;margin:3rem 0 1.1rem;padding-top:1.2rem;border-top:1px dashed var(--line-strong)}
 h3.step .s{font-family:var(--f-body);font-weight:800;color:var(--gold);font-size:.78rem;letter-spacing:.2em}
 h3.step small{font-family:var(--f-body);font-weight:500;color:var(--muted);font-size:.92rem}
 .note{color:var(--muted);font-size:1rem;margin:.8rem 0 0}
 
 /* ── 프롬프트 카드 ── */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:1.1rem}
-.pcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.25rem 1.3rem 1.1rem;display:flex;flex-direction:column;gap:.75rem;min-width:0;box-shadow:var(--shadow);transition:border-color .2s;touch-action:pan-y}
+.grid{display:grid;grid-template-columns:1fr;gap:1.1rem}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.35rem 1.4rem 1.15rem;display:flex;flex-direction:column;gap:.75rem;min-width:0;box-shadow:var(--shadow);transition:border-color .2s;touch-action:pan-y}
 .pcard:hover{border-color:var(--line-strong)}
 .pcard.bad{background:var(--surface-2);box-shadow:none;border-style:dashed}
 .pcard .top{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.pcard .label{font-weight:800;font-size:1.02rem}
+.pcard .label{font-weight:800;font-size:1.08rem;color:var(--gold)}
 .tag{font-size:.72rem;font-weight:700;padding:.08rem .55rem;border-radius:999px;letter-spacing:.04em}
 .tag-bad{color:var(--rose);background:var(--rose-soft)}
 .tag-good{color:var(--ok);border:1px solid currentColor}
@@ -210,7 +212,7 @@ input[type=text]:focus{outline:none;border-color:var(--gold-deco);box-shadow:0 0
 .review-out{background:var(--surface);border:1px solid var(--gold-deco);border-radius:18px;padding:1.4rem 1.4rem 1.1rem;display:grid;gap:.9rem;box-shadow:var(--shadow)}
 .review-out .ptext{font-size:1.15rem;line-height:1.95}
 .review-out .ptext.empty{color:var(--muted)}
-.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:1.4rem}
+.split{display:grid;grid-template-columns:1fr;gap:0}
 
 footer{margin-top:2rem;background:var(--band);color:var(--band-muted);font-size:.9rem}
 footer .wrap{padding-block:2.4rem calc(5.5rem + env(safe-area-inset-bottom,0px))}
